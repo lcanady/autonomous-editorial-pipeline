@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "url": "https://dailycaller.com/feed/",
+        "url": "https://api.dailycaller.com/?key={{$env[\"DAILYCALLER_API_KEY\"]}}&feed=full",
         "options": {}
       },
       "id": "rss-read-id",

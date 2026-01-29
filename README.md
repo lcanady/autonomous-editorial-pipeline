@@ -38,7 +38,23 @@ Code** node which requires n8n version 0.190.0 or higher.
 4. **Install**: Install the app to your workspace and copy the Bot User OAuth
    Token.
 
-### 3. Importing Workflows
+### 3. Environment Variables
+
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Open `.env` and fill in your actual credentials:
+   - `DAILYCALLER_API_KEY`: Your authentic Daily Caller API key.
+   - `N8N_WEBHOOK_BASE_URL`: The base URL of your n8n instance (e.g.,
+     `https://n8n.yourdomain.com`).
+
+> [!IMPORTANT]
+> For n8n to read these variables, ensure they are available in the environment
+> where n8n is running. If using Docker, add the `.env` file to your
+> `docker-compose.yaml`.
+
+### 4. Importing Workflows
 
 1. Open n8n.
 2. For each `.n8n` file in the `workflows/` directory:
@@ -55,9 +71,10 @@ Code** node which requires n8n version 0.190.0 or higher.
 - **Distribution Webhook**: In the `Final Slack Output` workflow, update the
   **[Generate Block Kit]** node's button URL to point to your distribution
   webhook (e.g., `dlvr.it` or another n8n webhook).
-- **RSS Watcher**: Pols `https://dailycaller.com/feed/`. In n8n, set the polling
-  interval in the **RSS Watcher** node of the `Newswire Watcher` workflow
-  (default is 1 hour).
+- **RSS Watcher**: Pols
+  `https://api.dailycaller.com/?key=5998eefacc1ba0bb4860cef6d987d525&feed=full`.
+  In n8n, set the polling interval in the **RSS Watcher** node of the
+  `Newswire Watcher` workflow (default is 1 hour).
 
 ## 📡 Usage
 
