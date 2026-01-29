@@ -1,0 +1,140 @@
+{
+  "name": "Master Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "command": "/signal",
+        "options": {}
+      },
+      "id": "slack-trigger-id",
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        240
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credential-id",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.text }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "analyze",
+              "output": 0
+            },
+            {
+              "value2": "image",
+              "output": 1
+            },
+            {
+              "value2": "post",
+              "output": 2
+            }
+          ]
+        }
+      },
+      "id": "switch-node-id",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        600,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "analysis-sub-workflow-id"
+      },
+      "id": "analysis-node-id",
+      "name": "[Analysis]",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        820,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "image-curation-sub-workflow-id"
+      },
+      "id": "image-curation-node-id",
+      "name": "[Image-Curation]",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        820,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "final-slack-output-sub-workflow-id"
+      },
+      "id": "final-slack-output-node-id",
+      "name": "[Final-Slack-Output]",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        820,
+        340
+      ]
+    }
+  ],
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "[Analysis]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[Image-Curation]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[Final-Slack-Output]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

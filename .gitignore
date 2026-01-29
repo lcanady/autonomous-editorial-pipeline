@@ -1,0 +1,15 @@
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# n8n Environment
+.n8n/
+node_modules/
+
+# AI Workflow Metadata (Excluded as requested)
+.agent/
+.loki/
+.gemini/
+
+# Workflow backups
+*.json_bak

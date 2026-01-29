@@ -1,0 +1,112 @@
+{
+  "name": "Distribution Module",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "distribution",
+        "options": {}
+      },
+      "id": "webhook-trigger-id",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dlvr.it/v1/post",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"headline\": \"{{ $json.query.headline }}\",\n  \"body\": \"{{ $json.query.body }}\",\n  \"media\": [\"{{ $json.query.image }}\"]\n}",
+        "options": {}
+      },
+      "id": "dlvrit-post-id",
+      "name": "Post to dlvr.it",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        300,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "dlvrit-api-key",
+          "name": "dlvr.it API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "GSHEET_ID_HERE",
+        "range": "A:E",
+        "options": {},
+        "valuesSend": "fields",
+        "fieldsUi": {
+          "values": [
+            {
+              "fieldId": "Timestamp",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            },
+            {
+              "fieldId": "Headline",
+              "fieldValue": "={{ $json.query.headline }}"
+            },
+            {
+              "fieldId": "Article URL",
+              "fieldValue": "={{ $json.query.article_url }}"
+            },
+            {
+              "fieldId": "Status",
+              "fieldValue": "Approved"
+            }
+          ]
+        }
+      },
+      "id": "gsheet-log-id",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        300,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gsheet-credentials-id",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Post to dlvr.it",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

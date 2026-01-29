@@ -1,0 +1,124 @@
+{
+  "name": "Modular Dispatcher",
+  "nodes": [
+    {
+      "parameters": {
+        "feedUrl": "https://dailycaller.com/feed"
+      },
+      "id": "rss-trigger-id",
+      "name": "RSS Feed Trigger",
+      "type": "n8n-nodes-base.rssFeedTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  article_url: $json.link,\n  timestamp: new Date().toISOString(),\n  metadata: {\n    source: \"DailyCaller\",\n    title: $json.title\n  },\n  modules: {}\n};"
+      },
+      "id": "prepare-json-id",
+      "name": "Prepare Canonical JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "analysis-sub-workflow-id"
+      },
+      "id": "analysis-node-id",
+      "name": "[Analysis]",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        600,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "newswire-curation-sub-workflow-id"
+      },
+      "id": "newswire-curation-node-id",
+      "name": "[Newswire-Curation]",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "final-slack-output-sub-workflow-id"
+      },
+      "id": "slack-interface-node-id",
+      "name": "[Slack-Interface]",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Canonical JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Canonical JSON": {
+      "main": [
+        [
+          {
+            "node": "[Analysis]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[Analysis]": {
+      "main": [
+        [
+          {
+            "node": "[Newswire-Curation]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[Newswire-Curation]": {
+      "main": [
+        [
+          {
+            "node": "[Slack-Interface]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

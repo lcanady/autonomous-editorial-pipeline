@@ -1,0 +1,64 @@
+{
+  "name": "Newswire Curation Module",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": {{ $json.image_keywords.join(' ') }},\n  \"include_images\": true,\n  \"search_depth\": \"advanced\",\n  \"max_results\": 5\n}",
+        "options": {}
+      },
+      "id": "tavily-search-id",
+      "name": "Tavily Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        250,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tavily-api-key",
+          "name": "Tavily API Key"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const images = $node[\"Tavily Search\"].json.images || [];\nconst inputData = $input.first().json;\nconst fallbackUrl = \"https://via.placeholder.com/800x450?text=BREAKING+NEWS\";\n\n// Preferred news wire domains\nconst preferredDomains = ['gettyimages', 'associatedpress', 'ap.org', 'unsplash'];\n\nlet selectedImage = null;\n\n// Strategy: Find first image from a preferred domain\nfor (const img of images) {\n    if (preferredDomains.some(domain => img.url.toLowerCase().includes(domain))) {\n        selectedImage = img.url;\n        break;\n    }\n}\n\n// If no preferred domain image found, take the first available image\nif (!selectedImage && images.length > 0) {\n    selectedImage = images[0].url;\n}\n\nreturn {\n    ...inputData,\n    module: \"newswire-curation\",\n    image_url: selectedImage || fallbackUrl,\n    curation_source: selectedImage ? \"newswire\" : \"fallback\"\n};"
+      },
+      "id": "curation-logic-id",
+      "name": "[Newswire-Curation] Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Tavily Search": {
+      "main": [
+        [
+          {
+            "node": "[Newswire-Curation] Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

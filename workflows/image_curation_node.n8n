@@ -1,0 +1,27 @@
+{
+  "name": "Image Curation Module (Node.js)",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const keywords = $input.first().json.image_keywords || [];\nif (keywords.length === 0) {\n    return { error: 'No keywords provided' };\n}\n\n// Conservative image filtering - try each keyword until we find a suitable image\nasync function findConservativeImage(keywords) {\n    for (const keyword of keywords) {\n        try {\n            const searchTerm = encodeURIComponent(keyword);\n            const url = `https://unsplash.com/napi/search/photos?query=${searchTerm}&per_page=5`;\n            \n            const response = await fetch(url);\n            const data = await response.json();\n\n            if (data.results && data.results.length > 0) {\n                // Filter for appropriate imagery\n                const appropriateImage = data.results.find(img => {\n                    const description = (img.description || '').toLowerCase();\n                    const altDescription = (img.alt_description || '').toLowerCase();\n                    \n                    // Avoid overly liberal/progressive imagery\n                    const avoidTerms = ['protest', 'liberal', 'progressive', 'blm', 'antifa', 'rainbow', 'pride', 'bernie', 'socialist'];\n                    const hasAvoidTerms = avoidTerms.some(term => \n                        description.includes(term) || altDescription.includes(term)\n                    );\n                    \n                    // Prefer patriotic, traditional, family, community imagery\n                    const preferTerms = ['american', 'flag', 'patriotic', 'family', 'community', 'traditional', 'church', 'military', 'police', 'farm', 'rural'];\n                    const hasPreferTerms = preferTerms.some(term => \n                        description.includes(term) || altDescription.includes(term)\n                    );\n                    \n                    return !hasAvoidTerms && (hasPreferTerms || !hasAvoidTerms);\n                });\n                \n                const selectedImage = appropriateImage || data.results[0];\n                \n                return {\n                    image_url: selectedImage.urls.regular,\n                    attribution_url: selectedImage.links.html,\n                    keyword_used: keyword,\n                    description: selectedImage.description || selectedImage.alt_description || 'Conservative-themed image'\n                };\n            }\n        } catch (error) {\n            console.log(`Failed to fetch for keyword: ${keyword}`, error.message);\n            continue;\n        }\n    }\n    \n    // Fallback to patriotic imagery if no specific images found\n    try {\n        const fallbackUrl = `https://unsplash.com/napi/search/photos?query=american%20flag%20patriotic&per_page=1`;\n        const response = await fetch(fallbackUrl);\n        const data = await response.json();\n        \n        if (data.results && data.results.length > 0) {\n            const image = data.results[0];\n            return {\n                image_url: image.urls.regular,\n                attribution_url: image.links.html,\n                keyword_used: 'american flag patriotic (fallback)',\n                description: 'Patriotic American imagery'\n            };\n        }\n    } catch (error) {\n        console.log('Fallback also failed:', error.message);\n    }\n    \n    return { error: 'No suitable conservative images found', keywords_tried: keywords };\n}\n\nreturn await findConservativeImage(keywords);"
+      },
+      "id": "image-curation-js-id",
+      "name": "[Image-Curation] Logic (Node.js)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

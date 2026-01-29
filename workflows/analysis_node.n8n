@@ -1,0 +1,94 @@
+{
+  "name": "Analysis Module",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $json.article_url }}",
+        "responseFormat": "string",
+        "options": {}
+      },
+      "id": "http-request-id",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "extractionValues": {
+          "values": [
+            {
+              "attribute": "",
+              "cssSelector": "h1.article-header__title",
+              "key": "headline",
+              "returnArray": false
+            },
+            {
+              "attribute": "",
+              "cssSelector": "div.article-content",
+              "key": "content",
+              "returnArray": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "html-extract-id",
+      "name": "HTML Extract",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const headline = $node[\"HTML Extract\"].json[\"headline\"];\nconst content = $node[\"HTML Extract\"].json[\"content\"];\n\n/**\n * Marketing Psychology applied:\n * 1. Authority Bias: Use \"BREAKING\" and news-style formatting.\n * 2. Social Proof/Liking: Focus on community action and neighbors helping neighbors.\n * 3. Loss Aversion: Highlight what is being taken away (service, safety, dignity).\n * 4. Framing: Frame the story as a struggle for sovereignty against bureaucratic indifference.\n */\n\nfunction generateFreshAngle(headline, content) {\n    const isBureaucracyIssue = content.toLowerCase().includes('city') || content.toLowerCase().includes('official') || content.toLowerCase().includes('bureaucrat');\n    \n    // 1. A punchy, news-style headline\n    let punchyHeadline = `🚨 BREAKING: ${headline.toUpperCase()}`;\n    if (isBureaucracyIssue) {\n        punchyHeadline = `🚨 CITIZENS SPEAK OUT: ${headline}`;\n    }\n\n    // 2. A one-paragraph post focusing on tradition or sovereignty\n    let facebookPost = \"\";\n    if (isBureaucracyIssue) {\n        facebookPost = `It's time we stop waiting for the bureaucrats to do their jobs while they continue to collect our hard-earned money. Our communities were built on the idea of looking out for one another, and as we see again today, it’s the neighbors—not the city officials—who actually step up when things get tough. We must protect our sovereignty and our families by standing together when the system fails us. Are you tired of being ignored? Let's show them the power of a united community! 🇺🇸🤝`;\n    } else {\n        facebookPost = `Our traditions and our way of life are what define us as a people. ${headline} is a stark reminder that we must remain vigilant in protecting our values and our independence. We don't need outsiders telling हमें how to live; we need more of the neighborly spirit that founded this great nation. We stand together, we work together, and we protect what is ours. 🇺🇸`;\n    }\n\n    // 3. Context-aware image keywords for conservative audience\n    function generateConservativeImageKeywords(headline, content) {\n        const text = (headline + ' ' + content).toLowerCase();\n        \n        // Issue-specific keywords\n        if (text.includes('immigration') || text.includes('border')) {\n            return ['american border security', 'patriotic border patrol', 'sovereignty protection'];\n        }\n        if (text.includes('tax') || text.includes('spending') || text.includes('budget')) {\n            return ['american taxpayers', 'fiscal responsibility', 'conservative economics'];\n        }\n        if (text.includes('gun') || text.includes('second amendment')) {\n            return ['second amendment rights', 'american gun owners', 'constitutional freedom'];\n        }\n        if (text.includes('election') || text.includes('voting')) {\n            return ['election integrity', 'american voting rights', 'patriotic voters'];\n        }\n        if (text.includes('school') || text.includes('education')) {\n            return ['traditional education', 'parents rights', 'american school choice'];\n        }\n        if (text.includes('police') || text.includes('crime') || text.includes('law enforcement')) {\n            return ['american police officers', 'law and order', 'community safety'];\n        }\n        if (text.includes('military') || text.includes('veteran')) {\n            return ['american military heroes', 'patriotic veterans', 'national defense'];\n        }\n        if (text.includes('energy') || text.includes('oil') || text.includes('gas')) {\n            return ['american energy independence', 'oil and gas workers', 'energy freedom'];\n        }\n        if (text.includes('farm') || text.includes('agriculture') || text.includes('rural')) {\n            return ['american farmers', 'rural america', 'traditional agriculture'];\n        }\n        if (text.includes('church') || text.includes('faith') || text.includes('religious')) {\n            return ['american religious freedom', 'traditional faith', 'christian values'];\n        }\n        if (text.includes('family') || text.includes('children') || text.includes('parent')) {\n            return ['traditional american family', 'family values', 'patriotic parenting'];\n        }\n        \n        // Bureaucracy/government overreach\n        if (text.includes('city') || text.includes('official') || text.includes('bureaucrat')) {\n            return ['citizens vs bureaucracy', 'american freedom fighters', 'community sovereignty'];\n        }\n        \n        // Default conservative themes\n        return ['patriotic americans', 'traditional values', 'american freedom'];\n    }\n\n    const imageKeywords = generateConservativeImageKeywords(headline, content);\n\n    return {\n        fresh_angle_headline: punchyHeadline,\n        facebook_post: facebookPost,\n        image_keywords: imageKeywords\n    };\n}\n\nreturn generateFreshAngle(headline, content);"
+      },
+      "id": "code-node-id",
+      "name": "[Analysis] Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML Extract": {
+      "main": [
+        [
+          {
+            "node": "[Analysis] Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}
