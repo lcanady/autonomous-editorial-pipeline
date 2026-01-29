@@ -1,0 +1,53 @@
+{
+  "name": "Newswire Watcher",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://dailycaller.com/feed/",
+        "options": {}
+      },
+      "id": "rss-read-id",
+      "name": "RSS Watcher",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "master-orchestrator-sub-workflow-id"
+      },
+      "id": "trigger-orchestrator-id",
+      "name": "Trigger Orchestrator",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        550,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "RSS Watcher": {
+      "main": [
+        [
+          {
+            "node": "Trigger Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

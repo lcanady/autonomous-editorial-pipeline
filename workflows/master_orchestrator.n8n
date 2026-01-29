@@ -2,6 +2,17 @@
   "name": "Master Orchestrator",
   "nodes": [
     {
+      "parameters": {},
+      "id": "execute-workflow-trigger-id",
+      "name": "On Execution",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        400
+      ]
+    },
+    {
       "parameters": {
         "command": "/signal",
         "options": {}
@@ -105,6 +116,17 @@
     }
   ],
   "connections": {
+    "On Execution": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Slack Trigger": {
       "main": [
         [

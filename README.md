@@ -18,6 +18,9 @@ This repository contains the following modular components:
   Generates the Slack Block Kit UI with an approval button.
 - **[QC Supervisor Module](file:///Users/kumakun/github/n8n-workflow/workflows/qc_supervisor_node.n8n)**:
   Intercepts content to verify factual grounding and check for banned keywords.
+- **[Newswire Watcher](file:///Users/kumakun/github/n8n-workflow/workflows/newswire_watcher.n8n)**:
+  Automatically polls the Daily Caller RSS feed and triggers analysis for new
+  articles.
 
 ## 🛠 Setup Instructions
 
@@ -52,10 +55,21 @@ Code** node which requires n8n version 0.190.0 or higher.
 - **Distribution Webhook**: In the `Final Slack Output` workflow, update the
   **[Generate Block Kit]** node's button URL to point to your distribution
   webhook (e.g., `dlvr.it` or another n8n webhook).
+- **RSS Watcher**: Pols `https://dailycaller.com/feed/`. In n8n, set the polling
+  interval in the **RSS Watcher** node of the `Newswire Watcher` workflow
+  (default is 1 hour).
 
 ## 📡 Usage
 
+### Manual Trigger
+
 In any Slack channel, type: `/signal [URL to Daily Caller Article] analyze`
+
+### Automated Discovery
+
+The **Newswire Watcher** automatically polls the Daily Caller RSS feed. When a
+new article is found, it triggers the same pipeline as the manual command
+without human intervention.
 
 The orchestrator will:
 
