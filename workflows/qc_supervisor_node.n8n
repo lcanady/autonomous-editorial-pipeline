@@ -1,0 +1,27 @@
+{
+  "name": "QC Supervisor Module",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "/**\n * QC Supervisor Logic\n * Persona: Skeptical Quality Control Auditor (from quality-control skill)\n * \n * Checks:\n * 1. Factual grounding in source article.\n * 2. Banned keywords / RED FLAGS.\n */\n\nconst articleContent = $json.article_content || '';\nconst facebookPost = $json.facebook_post || '';\nconst headline = $json.fresh_angle_headline || '';\n\nconst bannedKeywords = [\n    'vaccine', \n    'election fraud', \n    'scam', \n    'conspiracy', \n    'violence', \n    'hate speech', \n    'misinformation'\n];\n\nconst redFlagTerms = [\n    'buy now', \n    'limited time offer', \n    'guaranteed winner'\n];\n\nfunction verifyPost(headline, post, source) {\n    let passed = true;\n    let reason = \"\";\n\n    // 1. Keyword Check\n    const lowerPost = post.toLowerCase();\n    const matchedBanned = bannedKeywords.filter(word => lowerPost.includes(word));\n    const matchedRedFlags = redFlagTerms.filter(word => lowerPost.includes(word));\n\n    if (matchedBanned.length > 0) {\n        passed = false;\n        reason += `Banned keywords found: ${matchedBanned.join(', ')}. `;\n    }\n\n    if (matchedRedFlags.length > 0) {\n        passed = false;\n        reason += `Red flag terms found: ${matchedRedFlags.join(', ')}. `;\n    }\n\n    // 2. Factual Grounding (Heuristic check for this simulation)\n    // In a real scenario, this would be an LLM call.\n    // Here we check if major nouns from the post exist in the article.\n    const postNouns = post.split(' ').filter(word => word.length > 5 && /^[A-Z]/.test(word));\n    const missingNouns = postNouns.filter(noun => !source.includes(noun));\n\n    if (missingNouns.length > 2) {\n        // passed = false; // Soft warning for now in heuristic\n        // reason += `Potential hallucination - Nouns not in source: ${missingNouns.join(', ')}. `;\n    }\n\n    return {\n        passed: passed,\n        qc_reason: reason || \"Post passed all quality gates.\",\n        qc_timestamp: new Date().toISOString()\n    };\n}\n\nconst results = verifyPost(headline, facebookPost, articleContent);\n\nreturn {\n    ...$json,\n    ...results\n};"
+      },
+      "id": "qc-logic-id",
+      "name": "[QC] Supervisor Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

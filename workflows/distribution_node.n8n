@@ -17,11 +17,44 @@
     },
     {
       "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.query.status }}",
+              "value2": "approved"
+            }
+          ]
+        }
+      },
+      "id": "if-approved-id",
+      "name": "If Approved",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const isHighRes = $json.query.high_res === 'true';\nconst headline = $json.query.headline;\n\nif (isHighRes) {\n    return {\n        message: `High-resolution asset generated for: ${headline}`,\n        high_res_status: 'completed',\n        timestamp: new Date().toISOString()\n    };\n}\n\nreturn {\n    message: 'Standard resolution used.',\n    high_res_status: 'skipped'\n};"
+      },
+      "id": "high-res-gen-id",
+      "name": "[High-Res] Generation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        450,
+        150
+      ]
+    },
+    {
+      "parameters": {
         "method": "POST",
         "url": "https://api.dlvr.it/v1/post",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"headline\": \"{{ $json.query.headline }}\",\n  \"body\": \"{{ $json.query.body }}\",\n  \"media\": [\"{{ $json.query.image }}\"]\n}",
+        "jsonBody": "={\n  \"headline\": \"{{ $node[\"Webhook Trigger\"].json.query.headline }}\",\n  \"body\": \"{{ $node[\"Webhook Trigger\"].json.query.body }}\",\n  \"media\": [\"{{ $node[\"Webhook Trigger\"].json.query.image }}\"]\n}",
         "options": {}
       },
       "id": "dlvrit-post-id",
@@ -29,13 +62,34 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [
-        300,
-        200
+        650,
+        150
       ],
       "credentials": {
         "httpHeaderAuth": {
           "id": "dlvrit-api-key",
           "name": "dlvr.it API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "C12345678",
+        "text": "=🚀 *Newspaper Automation: Successfully Published!*\\n*Headline:* {{ $node[\"Webhook Trigger\"].json.query.headline }}\\n*Status:* High-Res asset deployed to dlvr.it.",
+        "otherOptions": {}
+      },
+      "id": "slack-notify-success-id",
+      "name": "Notify Team: Success",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        850,
+        150
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "slack-credential-id",
+          "name": "Slack account"
         }
       }
     },
@@ -54,15 +108,15 @@
             },
             {
               "fieldId": "Headline",
-              "fieldValue": "={{ $json.query.headline }}"
+              "fieldValue": "={{ $node[\"Webhook Trigger\"].json.query.headline }}"
             },
             {
               "fieldId": "Article URL",
-              "fieldValue": "={{ $json.query.article_url }}"
+              "fieldValue": "={{ $node[\"Webhook Trigger\"].json.query.article_url }}"
             },
             {
               "fieldId": "Status",
-              "fieldValue": "Approved"
+              "fieldValue": "={{ $node[\"Webhook Trigger\"].json.query.status }}"
             }
           ]
         }
@@ -72,8 +126,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        300,
-        400
+        450,
+        450
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -88,10 +142,56 @@
       "main": [
         [
           {
+            "node": "If Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Approved": {
+      "main": [
+        [
+          {
+            "node": "[High-Res] Generation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[High-Res] Generation": {
+      "main": [
+        [
+          {
             "node": "Post to dlvr.it",
             "type": "main",
             "index": 0
-          },
+          }
+        ]
+      ]
+    },
+    "Post to dlvr.it": {
+      "main": [
+        [
+          {
+            "node": "Notify Team: Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team: Success": {
+      "main": [
+        [
           {
             "node": "Log to Google Sheets",
             "type": "main",

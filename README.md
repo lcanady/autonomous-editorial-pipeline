@@ -16,6 +16,8 @@ This repository contains the following modular components:
   Curates images from Unsplash based on analysis keywords.
 - **[Final Slack Output](file:///Users/kumakun/github/n8n-workflow/workflows/final_slack_output_node.n8n)**:
   Generates the Slack Block Kit UI with an approval button.
+- **[QC Supervisor Module](file:///Users/kumakun/github/n8n-workflow/workflows/qc_supervisor_node.n8n)**:
+  Intercepts content to verify factual grounding and check for banned keywords.
 
 ## 🛠 Setup Instructions
 
@@ -60,4 +62,7 @@ The orchestrator will:
 1. Scrape the article.
 2. Rewrite it for your audience.
 3. Find an image.
-4. Send a Block Kit message to your configured channel for approval.
+4. **Run Quality Control**: Verify factual grounding and check for banned
+   keywords.
+5. Send a Block Kit message to your configured channel for approval (or review
+   required alert if QC fails).

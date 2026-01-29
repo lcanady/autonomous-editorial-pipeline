@@ -86,8 +86,21 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        820,
+        1050,
         340
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "qc-supervisor-sub-workflow-id"
+      },
+      "id": "qc-supervisor-node-id",
+      "name": "[QC-Supervisor]",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        820,
+        450
       ]
     }
   ],
@@ -119,6 +132,17 @@
             "index": 0
           }
         ],
+        [
+          {
+            "node": "[QC-Supervisor]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[QC-Supervisor]": {
+      "main": [
         [
           {
             "node": "[Final-Slack-Output]",
