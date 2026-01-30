@@ -13,3 +13,4 @@ node_modules/
 
 # Workflow backups
 *.json_bak
+.env

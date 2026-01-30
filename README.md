@@ -58,9 +58,9 @@ export $(cat .env.local | xargs) && n8n start
 
 ```yaml
 services:
-    n8n:
-        env_file:
-            - .env.local
+  n8n:
+    env_file:
+      - .env.local
 ```
 
 > [!IMPORTANT]
@@ -85,7 +85,7 @@ services:
   **[Generate Block Kit]** node's button URL to point to your distribution
   webhook (e.g., `dlvr.it` or another n8n webhook).
 - **RSS Watcher**: Pols
-  `https://api.dailycaller.com/?key=5998eefacc1ba0bb4860cef6d987d525&feed=full`.
+  `https://api.dailycaller.com/?key={{$env["DAILYCALLER_API_KEY"]}}&feed=full`.
   In n8n, set the polling interval in the **RSS Watcher** node of the
   `Newswire Watcher` workflow (default is 1 hour).
 
