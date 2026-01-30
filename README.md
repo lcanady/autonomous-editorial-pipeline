@@ -40,19 +40,32 @@ Code** node which requires n8n version 0.190.0 or higher.
 
 ### 3. Environment Variables
 
-1. Copy `.env.example` to `.env`:
+1. Copy `.env.example` to `.env.local`:
    ```bash
-   cp .env.example .env
+   cp .env.example .env.local
    ```
-2. Open `.env` and fill in your actual credentials:
-   - `DAILYCALLER_API_KEY`: Your authentic Daily Caller API key.
-   - `N8N_WEBHOOK_BASE_URL`: The base URL of your n8n instance (e.g.,
-     `https://n8n.yourdomain.com`).
+2. Open `.env.local` and fill in your actual credentials.
+
+#### 💡 How to load into n8n
+
+**For Local Terminal (NPM):** Before starting n8n, source the file:
+
+```bash
+export $(cat .env.local | xargs) && n8n start
+```
+
+**For Docker:** In your `docker-compose.yaml`, reference the file:
+
+```yaml
+services:
+    n8n:
+        env_file:
+            - .env.local
+```
 
 > [!IMPORTANT]
-> For n8n to read these variables, ensure they are available in the environment
-> where n8n is running. If using Docker, add the `.env` file to your
-> `docker-compose.yaml`.
+> Once loaded, n8n can access these via `{{ $env["VARIABLE_NAME"] }}` in any
+> node expression.
 
 ### 4. Importing Workflows
 
